@@ -117,15 +117,16 @@ data_train = pd.merge(data_train, default_by_present_employment, how="left", \
 data_train = data_train.rename({"Target_final": "Target", "Target_grouped": \
     "Present_employment_mean"}, axis=1)
 
+cols_baseline = list(cols_dummies.keys()) + list(cols_numerical.keys()) + \
+    ["Status_checking_account_mean", "Credit_history_mean", \
+        "Savings_account/bonds_mean", "Present_employment_mean"]
+
 # Run a logistic regression model
-y, X = data_train[list(cols_target.keys())[0]], sm.add_constant(data_train[list(cols_dummies.keys()) + \
-    list(cols_numerical.keys()) + ["Status_checking_account_mean", "Credit_history_mean", \
-        "Savings_account/bonds_mean", "Present_employment_mean"]])
+y, X = data_train[list(cols_target.keys())[0]], sm.add_constant(data_train[cols_baseline])
 res_reg_logit = sm.Logit(y, X).fit()
 pred_prob_reg_logit = res_reg_logit.predict(X)
 print(res_reg_logit.summary())
 
-opt_hurdle = 0.5
 pred_y_reg_logit = (pred_prob_reg_logit >= 0.5) * 1
 
 # Run a decision tree and a random forest model
@@ -138,6 +139,9 @@ rf = RandomForestClassifier(n_estimators=50, min_samples_leaf=20, random_state=0
 rf_model = rf.fit(X, y)
 
 pred_y_rf = rf_model.predict(X)
+
+#with open("german_credit_data/models/cols_baseline.pickle", "wb") as file:
+#    pickle.dump(cols_baseline, file)
 
 #with open("german_credit_data/models/baseline_mean_encod_rf.pickle", "wb") as file:
 #    pickle.dump(rf_model, file)
@@ -184,11 +188,9 @@ data_val = data_val.rename({"Target_final": "Target", "Target_grouped": \
     "Present_employment_mean"}, axis=1)
 
 # Perform model validation
-y_val, X_val = data_val[list(cols_target.keys())[0]], sm.add_constant(data_val[list(cols_dummies.keys()) + \
-    list(cols_numerical.keys()) + ["Status_checking_account_mean", "Credit_history_mean", \
-        "Savings_account/bonds_mean", "Present_employment_mean"]])
+y_val, X_val = data_val[list(cols_target.keys())[0]], sm.add_constant(data_val[cols_baseline])
 pred_prob_reg_logit_val = res_reg_logit.predict(X_val)
-pred_y_reg_logit_val = (pred_prob_reg_logit_val >= opt_hurdle) * 1
+pred_y_reg_logit_val = (pred_prob_reg_logit_val >= 0.5) * 1
 
 pred_y_dtree_val = dtree_model.predict(X_val)
 
