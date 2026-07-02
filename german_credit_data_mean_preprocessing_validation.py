@@ -68,6 +68,9 @@ for col in data_train.columns:
     else:
         cols_numerical[col] = len(np.unique(data_train[col]))
 
+del cols_numerical["Duration_month"]
+del cols_numerical["Credit_amount"]
+
 print("Target variable \n", cols_target)
 print("Numerical columns \n", cols_numerical)
 print("Categorical columns \n", cols_categorical)
@@ -121,6 +124,9 @@ cols_baseline = list(cols_dummies.keys()) + list(cols_numerical.keys()) + \
     ["Status_checking_account_mean", "Credit_history_mean", \
         "Savings_account/bonds_mean", "Present_employment_mean"]
 
+#with open("german_credit_data/models/cols_baseline.pickle", "wb") as file:
+#    pickle.dump(cols_baseline, file)
+
 # Run a logistic regression model
 y, X = data_train[list(cols_target.keys())[0]], sm.add_constant(data_train[cols_baseline])
 res_reg_logit = sm.Logit(y, X).fit()
@@ -128,6 +134,8 @@ pred_prob_reg_logit = res_reg_logit.predict(X)
 print(res_reg_logit.summary())
 
 pred_y_reg_logit = (pred_prob_reg_logit >= 0.5) * 1
+
+#smpickle.save_pickle(res_reg_logit, "german_credit_data/models/baseline_mean_encod_reg_logit.pickle")
 
 # Run a decision tree and a random forest model
 dtree = DecisionTreeClassifier(min_samples_leaf=20)
@@ -139,9 +147,6 @@ rf = RandomForestClassifier(n_estimators=50, min_samples_leaf=20, random_state=0
 rf_model = rf.fit(X, y)
 
 pred_y_rf = rf_model.predict(X)
-
-#with open("german_credit_data/models/cols_baseline.pickle", "wb") as file:
-#    pickle.dump(cols_baseline, file)
 
 #with open("german_credit_data/models/baseline_mean_encod_rf.pickle", "wb") as file:
 #    pickle.dump(rf_model, file)
@@ -155,8 +160,6 @@ print("The accuracy score for decision tree on train dataset \n", \
     accuracy_score(y, pred_y_dtree))
 print("The accuracy score for random forest on train dataset \n", \
     accuracy_score(y, pred_y_rf))
-
-#smpickle.save_pickle(res_reg_logit, "german_credit_data/models/baseline_mean_encod_reg_logit.pickle")
 
 # Add mean encoded variables to the validation dataset
 # Status of the checking account

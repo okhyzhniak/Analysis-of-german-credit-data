@@ -90,8 +90,6 @@ y, X = data_train["Target"], sm.add_constant(data_train[cols_baseline])
 res_reg_logit = sm.Logit(y, X).fit()
 print(res_reg_logit.summary())
 
-opt_hurdle = 0.5
-
 pred_y_reg_logit_train = (res_reg_logit.predict(X) >= 0.5) * 1
 
 print("Accuracy on the train set for logistic regression \n", \

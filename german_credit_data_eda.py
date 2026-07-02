@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import scipy.stats as stats
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 
@@ -84,4 +85,8 @@ plt.title("The distribution of credit card debtor's age by repayment type")
 plt.legend()
 plt.show()
 
+print("Spearman correlation coefficient \n", \
+    stats.spearmanr(data_train_final["Age"], data_train_final["Target"]))
+print("Kendall tau correlation coefficient \n", \
+    stats.kendalltau(data_train_final["Age"], data_train_final["Target"]))
 
