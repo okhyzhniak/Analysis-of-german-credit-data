@@ -12,7 +12,8 @@ def rename_cols(data):
     data = data.rename({"0": "Status_checking_account", "1": "Duration_month"}, axis=1)
 
     data = data.rename({"2": "Credit_history", "3": "Credit_amount", "4": "Savings_account/bonds", \
-        "5": "Present_employment", "9": "Age", "10": "Other_debtors/guarantors", "24": "Target"}, axis=1)
+        "5": "Present_employment", "6": "Job", "9": "Age", "10": "Other_debtors/guarantors", \
+            "24": "Target"}, axis=1)
 
     dummy_rename_dict = {str(val): "Dummy_" + str(val) for val in range(15, 24)}
     data = data.rename(dummy_rename_dict, axis=1)
@@ -29,7 +30,10 @@ data_test = pd.read_csv("german_credit_data/data/data_test.csv")
 data_train = pd.read_csv("german_credit_data/data/data_train.csv")
 data_val = pd.read_csv("german_Credit_data/data/data_val.csv")
 
-cols_drop1 = [str(col) for col in range(6,9)]
+print(data_train.shape)
+print(data_val.shape)
+
+cols_drop1 = [str(col) for col in range(7,9)]
 cols_drop2 = [str(col) for col in range(11,15)]
 
 data_train = data_train.drop(cols_drop1 + cols_drop2, axis=1)
@@ -60,7 +64,8 @@ data_test = add_dummy_vars(data_test, cols_categorical)
 
 # Drop base dummy variables 
 cols_drop_dummy_base = ["Dummy_status_checking_account_2", "Dummy_credit_history_0", \
-    "Dummy_savings_account/bonds_1", "Dummy_present_employment_2", "Dummy_other_debtors/guarantors_1"]
+    "Dummy_savings_account/bonds_1", "Dummy_job_2", "Dummy_present_employment_2", \
+        "Dummy_other_debtors/guarantors_1"]
 
 data_train = data_train.drop(cols_drop_dummy_base, axis=1)
 data_test = data_test.drop(cols_drop_dummy_base, axis=1)

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 import statsmodels.iolib.smpickle as smpickle
 import matplotlib.pyplot as plt
 
@@ -20,7 +21,7 @@ data_val = pd.read_csv("german_credit_data/data/data_val.csv")
 print("The shape of the train data \n", data_train.shape)
 print("The shape of the validation data \n", data_val.shape)
 
-cols_drop1 = [str(col) for col in range(6,9)]
+cols_drop1 = [str(col) for col in range(7,9)]
 cols_drop2 = [str(col) for col in range(11,15)]
 data_train = data_train.drop(cols_drop1 + cols_drop2, axis=1)
 data_val = data_val.drop(cols_drop1 + cols_drop2, axis=1)
@@ -31,7 +32,8 @@ print("The shape of the validation data \n", data_val.shape)
 data_val = data_val.rename({"0": "Status_checking_account", "1": "Duration_month"}, axis=1)
 
 data_val = data_val.rename({"2": "Credit_history", "3": "Credit_amount", "4": "Savings_account/bonds", \
-    "5": "Present_employment", "9": "Age", "10": "Other_debtors/guarantors", "24": "Target"}, axis=1)
+    "5": "Present_employment", "6": "Job", "9": "Age", "10": "Other_debtors/guarantors", \
+        "24": "Target"}, axis=1)
 
 dummy_rename_dict = {str(val): "Dummy_" + str(val) for val in range(15, 24)}
 data_val = data_val.rename(dummy_rename_dict, axis=1)
@@ -73,7 +75,8 @@ data_val = add_dummy_vars(data_val, cols_categorical)
 
 # Drop base dummy variables 
 cols_drop_dummy_base = ["Dummy_status_checking_account_2", "Dummy_credit_history_0", \
-    "Dummy_savings_account/bonds_1", "Dummy_present_employment_2", "Dummy_other_debtors/guarantors_1"]
+    "Dummy_savings_account/bonds_1", "Dummy_present_employment_2", "Dummy_job_2", \
+        "Dummy_other_debtors/guarantors_1"]
 
 data_train = data_train.drop(cols_drop_dummy_base, axis=1)
 data_val = data_val.drop(cols_drop_dummy_base, axis=1)
@@ -82,6 +85,10 @@ cols_dummies = {col: list(np.sort(data_train[col].unique())) for col in data_tra
     if col.startswith("Dummy")}
 
 cols_baseline = list(cols_dummies.keys()) + list(cols_numerical.keys())
+
+# Look at multicollinearity
+for (i, col) in enumerate(cols_baseline):
+    print("VIF for column {0} \n".format(col), variance_inflation_factor(data_train[cols_baseline], i))
 
 with open("german_credit_data/models/cols_baseline.pickle", "wb") as file:
     pickle.dump(cols_baseline, file)
