@@ -18,7 +18,7 @@ print("The shape of the test data \n", data_test.shape)
 data_train = data_train.rename({0: "Status_checking_account", 1: "Duration_month"}, axis=1)
 
 data_train = data_train.rename({2: "Credit_history", 3: "Credit_amount", 4: "Savings_account/bonds", \
-    5: "Present_employment", 9: "Age", 24: "Target"}, axis=1)
+    5: "Present_employment", 9: "Age", 10: "Other_debtors/guarantors", 24: "Target"}, axis=1)
 
 dummy_rename_dict = {val: "Dummy_" + str(val) for val in range(15, 24)}
 data_train = data_train.rename(dummy_rename_dict, axis=1)
@@ -65,7 +65,7 @@ print("The distrbution of the target variable by credit history \n", \
     pd.crosstab(data_train_final["Credit_history"], data_train_final["Target"], normalize=False))
 
 plt.hist(data_train_final["Credit_amount"][data_train_final["Target"] == 1], bins=50, label="Good loans")
-plt.hist(data_train_final["Credit_amount"][data_train["Target"] == 2], bins=50, label="Bad loans")
+plt.hist(data_train_final["Credit_amount"][data_train_final["Target"] == 2], bins=50, label="Bad loans")
 plt.title("The distribution of credit card loan amount by repayment type")
 plt.legend()
 plt.show()
@@ -77,7 +77,9 @@ print("The distribution of the target variable by the duration of present employ
     pd.crosstab(data_train_final["Present_employment"], data_train_final["Target"], normalize=False))
 
 print("The distribution of the target variable by the presence of other debtors/guarantors \n", \
-    pd.crosstab(data_train_final[10], data_train_final["Target"], normalize=False))
+    pd.crosstab(data_train_final["Other_debtors/guarantors"], data_train_final["Target"], normalize=False))
+print("Sperman correlation coefficient for other debtors/guarantors variable  \n", \
+    stats.spearmanr(data_train_final["Other_debtors/guarantors"], data_train_final["Target"]))
 
 plt.hist(data_train_final["Age"][data_train_final["Target"] == 1], bins=50, label="Good loans")
 plt.hist(data_train_final["Age"][data_train_final["Target"] == 2], bins=50, label="Bad loans")
@@ -85,7 +87,6 @@ plt.title("The distribution of credit card debtor's age by repayment type")
 plt.legend()
 plt.show()
 
-print("Pearson correlation coefficient \n", \
+print("Pearson correlation coefficient for age variable \n", \
     stats.pearsonr(data_train_final["Age"], data_train_final["Target"]))
-
-
+    

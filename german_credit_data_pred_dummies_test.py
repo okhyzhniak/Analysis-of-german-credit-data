@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+import statsmodels.iolib.smpickle as smpickle
 import matplotlib.pyplot as plt
 
 from sklearn.metrics import accuracy_score
@@ -11,7 +12,7 @@ def rename_cols(data):
     data = data.rename({"0": "Status_checking_account", "1": "Duration_month"}, axis=1)
 
     data = data.rename({"2": "Credit_history", "3": "Credit_amount", "4": "Savings_account/bonds", \
-        "5": "Present_employment", "9": "Age", "24": "Target"}, axis=1)
+        "5": "Present_employment", "9": "Age", "10": "Other_debtors/guarantors", "24": "Target"}, axis=1)
 
     dummy_rename_dict = {str(val): "Dummy_" + str(val) for val in range(15, 24)}
     data = data.rename(dummy_rename_dict, axis=1)
@@ -29,7 +30,7 @@ data_train = pd.read_csv("german_credit_data/data/data_train.csv")
 data_val = pd.read_csv("german_Credit_data/data/data_val.csv")
 
 cols_drop1 = [str(col) for col in range(6,9)]
-cols_drop2 = [str(col) for col in range(10,15)]
+cols_drop2 = [str(col) for col in range(11,15)]
 
 data_train = data_train.drop(cols_drop1 + cols_drop2, axis=1)
 data_val = data_val.drop(cols_drop1 + cols_drop2, axis=1)
@@ -59,7 +60,7 @@ data_test = add_dummy_vars(data_test, cols_categorical)
 
 # Drop base dummy variables 
 cols_drop_dummy_base = ["Dummy_status_checking_account_2", "Dummy_credit_history_0", \
-    "Dummy_savings_account/bonds_1", "Dummy_present_employment_2"]
+    "Dummy_savings_account/bonds_1", "Dummy_present_employment_2", "Dummy_other_debtors/guarantors_1"]
 
 data_train = data_train.drop(cols_drop_dummy_base, axis=1)
 data_test = data_test.drop(cols_drop_dummy_base, axis=1)
@@ -67,11 +68,11 @@ data_test = data_test.drop(cols_drop_dummy_base, axis=1)
 print("The shape of the train data \n", data_train.shape)
 print("The shape of the test data \n", data_test.shape)
 
-with open("german_credit_data/models/cols_baseline_dummies.pickle", "rb") as file:
-    cols_baseline_dummies = pickle.load(file)
+with open("german_credit_data/models/cols_baseline.pickle", "rb") as file:
+    cols_baseline = pickle.load(file)
 
 # Predict default using logistic regression
-y, X = data_train["Target"], sm.add_constant(data_train[cols_baseline_dummies])
+y, X = data_train["Target"], sm.add_constant(data_train[cols_baseline])
 res_reg_logit = sm.Logit(y, X).fit()
 print(res_reg_logit.summary())
 
@@ -80,8 +81,10 @@ pred_y_reg_logit_train = (res_reg_logit.predict(X) >= 0.5) * 1
 print("Accuracy on the train set for logistic regression \n", \
     accuracy_score(y, pred_y_reg_logit_train))
 
+# smpickle.save_pickle(res_reg_logit, "german_credit_data/models/baseline_reg_logit.pickle")
+
 # Evaluate model performance on the test data
-y_test, X_test = data_test["Target"], sm.add_constant(data_test[cols_baseline_dummies])
+y_test, X_test = data_test["Target"], sm.add_constant(data_test[cols_baseline])
 
 pred_y_reg_logit_test = (res_reg_logit.predict(X_test) >= 0.5) * 1
 
