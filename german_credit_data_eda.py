@@ -18,7 +18,8 @@ print("The shape of the test data \n", data_test.shape)
 data_train = data_train.rename({0: "Status_checking_account", 1: "Duration_month"}, axis=1)
 
 data_train = data_train.rename({2: "Credit_history", 3: "Credit_amount", 4: "Savings_account/bonds", \
-    5: "Present_employment", 6: "Job", 9: "Age", 10: "Other_debtors/guarantors", 24: "Target"}, axis=1)
+    5: "Present_employment", 6: "Job", 8: "Property", 9: "Age", 10: "Other_debtors/guarantors", \
+        24: "Target"}, axis=1)
 
 dummy_rename_dict = {val: "Dummy_" + str(val) for val in range(15, 24)}
 data_train = data_train.rename(dummy_rename_dict, axis=1)
@@ -83,6 +84,13 @@ print("Sperman correlation coefficient for other debtors/guarantors variable  \n
 
 print("The distribution of the target variable by job type \n", \
     pd.crosstab(data_train_final["Job"], data_train_final["Target"], normalize=False))
+print("Sperman correlation coefficient for the job variable  \n", \
+    stats.spearmanr(data_train_final["Job"], data_train_final["Target"]))
+
+print("The distribution of the target variable by owned property type \n", \
+    pd.crosstab(data_train_final["Property"], data_train_final["Target"], normalize=False))
+print("Sperman correlation coefficient for the property variable  \n", \
+    stats.spearmanr(data_train_final["Property"], data_train_final["Target"]))
 
 plt.hist(data_train_final["Age"][data_train_final["Target"] == 1], bins=50, label="Good loans")
 plt.hist(data_train_final["Age"][data_train_final["Target"] == 2], bins=50, label="Bad loans")
@@ -92,4 +100,4 @@ plt.show()
 
 print("Pearson correlation coefficient for age variable \n", \
     stats.pearsonr(data_train_final["Age"], data_train_final["Target"]))
-    
+
