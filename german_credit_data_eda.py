@@ -76,20 +76,22 @@ print("The distribution of the target variable by the presence of savings accoun
 
 print("The distribution of the target variable by the duration of present employment \n", \
     pd.crosstab(data_train_final["Present_employment"], data_train_final["Target"], normalize=False))
+print("Spearman correlation coefficient for the present employment variable  \n", \
+    stats.spearmanr(data_train_final["Present_employment"], data_train_final["Target"]))
 
 print("The distribution of the target variable by the presence of other debtors/guarantors \n", \
     pd.crosstab(data_train_final["Other_debtors/guarantors"], data_train_final["Target"], normalize=False))
-print("Sperman correlation coefficient for other debtors/guarantors variable  \n", \
+print("Spearman correlation coefficient for other debtors/guarantors variable  \n", \
     stats.spearmanr(data_train_final["Other_debtors/guarantors"], data_train_final["Target"]))
 
 print("The distribution of the target variable by job type \n", \
     pd.crosstab(data_train_final["Job"], data_train_final["Target"], normalize=False))
-print("Sperman correlation coefficient for the job variable  \n", \
+print("Spearman correlation coefficient for the job variable  \n", \
     stats.spearmanr(data_train_final["Job"], data_train_final["Target"]))
 
 print("The distribution of the target variable by owned property type \n", \
     pd.crosstab(data_train_final["Property"], data_train_final["Target"], normalize=False))
-print("Sperman correlation coefficient for the property variable  \n", \
+print("Spearman correlation coefficient for the property variable  \n", \
     stats.spearmanr(data_train_final["Property"], data_train_final["Target"]))
 
 plt.hist(data_train_final["Age"][data_train_final["Target"] == 1], bins=50, label="Good loans")
@@ -98,6 +100,6 @@ plt.title("The distribution of credit card debtor's age by repayment type")
 plt.legend()
 plt.show()
 
-print("Pearson correlation coefficient for age variable \n", \
+print("Pearson correlation coefficient for the age variable \n", \
     stats.pearsonr(data_train_final["Age"], data_train_final["Target"]))
 
